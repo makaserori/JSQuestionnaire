@@ -6,6 +6,7 @@
 <script>
 
 // Create a set of parallel arrays for each of the scales
+var participantID = "";
 var scale      = new Array();
 var left       = new Array();
 var right      = new Array();
@@ -153,11 +154,23 @@ function getScaleHTML(index)
 
 function onLoad()
 {
+
+}
+
+function buttonStart()
+{
 	// Get all the scales ready
 	for (var i = 0; i < NUM_SCALES; i++)
 	{
 		document.getElementById("scale" + i).innerHTML = getScaleHTML(i);
 	}
+
+	participantID = document.getElementById('participantID').value;
+
+	document.getElementById('div_start').style.display = 'none'; 
+	document.getElementById('div_part1').style.display = ''; 
+
+	return true;
 }
 
 // Users want to proceed after doing the scales
@@ -276,16 +289,23 @@ function getResultsHTML()
 	result += results_overall;
 	result += "<br/>";
 
+	result += "<br/>";
+	result += '<a href ="" id="csvDLLink">DL CSV</a>';
+
 	return result;
 }
 
 function generateCSV(){
-	let blob = new Blob([results_rating, ",", results_tally, ",", results_weight, ",", results_overall],{type:"text/csv"});
+	let blob = new Blob([participantID,",",results_rating, ",", results_tally, ",", results_weight, ",", results_overall],{type:"text/csv"});
 	let link = document.createElement('a');
 	link.href = URL.createObjectURL(blob);
 	const timestamp = new Date().toLocaleString().replace(/[/ :]/g, '_');
 	link.download = timestamp + '.csv';
 	link.click();
+
+	linktag = document.getElementById('csvDLLink');
+	linktag.setAttribute('href', link.getAttribute('href'));
+	linktag.setAttribute('download', timestamp + '.csv');
 }
 
 // Move to the next pair
@@ -294,10 +314,10 @@ function nextPair()
 	pair_num++;
 	if (pair_num >= 15)
 	{
-		document.getElementById('div_part3').style.display = 'none'; 
+		document.getElementById('div_part3').style.display = 'none';
 		document.getElementById('div_part4').style.display = '';
 		calcResults();
-		document.getElementById('div_part4').innerHTML = getResultsHTML();		
+		document.getElementById('div_part4').innerHTML = getResultsHTML();
 		generateCSV();
 	}
 	else
@@ -373,7 +393,20 @@ function nextPair()
 	</style>
 </head>
 <body onLoad="onLoad();">
-<div id="div_part1">
+<div id="div_start">
+アンケートアプリ <br/>
+<br/>
+<div id="inputParticipantID">
+被験者ID
+<input type="text" id="participantID" name="participantID" required minlength="0" maxlength="8" size="10" />
+</div>
+<br/>
+<br/>
+<br/>
+
+<input class="next" id="next" type="button" value="次へ >>" onClick="buttonStart()">
+</div>
+<div id="div_part1" style="display:none">
 タスクアンケート - パート 1 <br/>
 <br/>
 タスクの経験に最も近い各スケール上のポイントをクリックしてください <br/>
